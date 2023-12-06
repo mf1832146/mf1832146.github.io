@@ -1,0 +1,291 @@
+
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>Ze Tang&#39;s Blogs</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://mf1832146.github.io/favicon.ico?v=1701838496309">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://mf1832146.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://mf1832146.github.io">
+        <img class="avatar" src="https://mf1832146.github.io/images/avatar.png?v=1701838496309" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://mf1832146.github.io">
+        <h1 class="site-title">Ze Tang&#39;s Blogs</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="https://mf1832146.github.io/tag/cPlUPLBAs/" class="menu purple-link">
+            代码生成
+          </a>
+        
+      
+        
+          <a href="https://mf1832146.github.io/tag/h1vpXEBBn/" class="menu purple-link">
+            论文阅读
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        
+        
+<section class="post-item">
+    <div class="content">
+      <a href="https://mf1832146.github.io/post/reading_book_genetic_programming/">
+        <h2 class="post-title">《A Field Guide to Genetic Programming》. Riccardo et. al. 2008. Chapter 1 Basics</h2>
+      </a>
+      <div class="post-abstract">
+        <blockquote>
+<p>To get machines to exhibit behaviour, which if done by humans, would be assumed to involve the use of intelligence. Samuel, 1983</p>
+</blockquote>
+<p>Genetic Programming (GP)是进化算法(Evolutionary Computation, EC)的一种。和标准EC一样，GP需要维护族群(多目标)，更新族群（组合Crossover和变异Mutation）,过滤，最后实现解决方案。不同的是，GP维护的基本单元，或者说基本DNA,是代码。本章节主要介绍族群(population)的存储表示、初始化、更新和选择。</p>
+
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2023-11-29</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://mf1832146.github.io/tag/h1vpXEBBn/">
+                reads
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://mf1832146.github.io/tag/cPlUPLBAs/">
+                codegen
+                
+              </a>
+            
+          </span>
+        
+      </div>
+    </div>
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://mf1832146.github.io/post/ji-yu-codalab-zuo-ke-fu-xian-de-yan-jiu-xiao-wai-ren-shi-bi-bei/">
+        <h2 class="post-title">基于Codalab做可复现的研究（校外人士必备）</h2>
+      </a>
+      <div class="post-abstract">
+        
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2023-12-06</span>
+        
+      </div>
+    </div>
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://mf1832146.github.io/post/notes-for-big-ideas-in-program-synthesis/">
+        <h2 class="post-title">Notes for Big Ideas in Program Synthesis.</h2>
+      </a>
+      <div class="post-abstract">
+        
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2023-11-28</span>
+        
+      </div>
+    </div>
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://mf1832146.github.io/post/how_to_write_code_crroectly/">
+        <h2 class="post-title">如何生成可执行的代码？</h2>
+      </a>
+      <div class="post-abstract">
+        <p>目前使用LM生成代码的方式是使用beam search或者sample解码。但是，这两种方式都无法保证生成代码的质量。并且，观察beam search生成的代码片段，发现其中出现大量无用重复的代码。由于分词的原因，代码生成属于长文本生成。beam在生成长文本时会出现大量重复(文本内和文本间)，以及无趣的情况。sample可以使得生成文本具有多样性，但是却也同时引入了随机性。那么该如何生成高可信，或者说可编译的代码是一个问题。</p>
+
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2023-10-02</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://mf1832146.github.io/tag/h1vpXEBBn/">
+                reads
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://mf1832146.github.io/tag/cPlUPLBAs/">
+                codegen
+                
+              </a>
+            
+          </span>
+        
+      </div>
+    </div>
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://mf1832146.github.io/post/domain-adaption-in-code-completion/">
+        <h2 class="post-title">论文阅读-Domain Adaption in Code Completion.</h2>
+      </a>
+      <div class="post-abstract">
+        <p>Code Completion usually needs domain knowledge, such as project information, domain-related third-party libraries or process knowledge (业务知识). 本博客记录一些关于使用domain知识的代码补全论文。</p>
+
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2023-10-02</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://mf1832146.github.io/tag/h1vpXEBBn/">
+                reads
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://mf1832146.github.io/tag/cPlUPLBAs/">
+                codegen
+                
+              </a>
+            
+          </span>
+        
+      </div>
+    </div>
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://mf1832146.github.io/post/reads_tree_probing/">
+        <h2 class="post-title">论文阅读 - A Structural Probe for Finding Syntax in Word Representations</h2>
+      </a>
+      <div class="post-abstract">
+        <p>研究树结构的位置编码是非常有意义的:</p>
+<ul>
+<li>让树结构数据的编码不再复杂，如果有一套位置编码，能够同时满足树中节点的相对位置和绝对位置（其实是相对于根节点的位置）计算，那么树结构数据将拥有和序列数据类似的特性，简单直接输入到Transformer模型中（Pre-order+位置）</li>
+<li>了解模型对语法的学习。由于语言符合语法规则，由语法规则合成的语言满足一棵语法树。如果能够根据编码计算出其对应树空间的距离，那么可以衡量到底语言模型是否知晓语法信息</li>
+</ul>
+
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2023-10-02</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://mf1832146.github.io/tag/h1vpXEBBn/">
+                reads
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://mf1832146.github.io/tag/cPlUPLBAs/">
+                codegen
+                
+              </a>
+            
+          </span>
+        
+      </div>
+    </div>
+    
+  </section>
+
+
+<div class="pagination-container">
+  
+  
+</div>
+
+
+      </div>
+
+      <div class="site-footer">
+  <div class="slogan"></div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://mf1832146.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

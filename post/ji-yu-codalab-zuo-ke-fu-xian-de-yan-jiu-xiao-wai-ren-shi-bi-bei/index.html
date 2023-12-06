@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>基于Codalab做可复现的研究（校外人士必备） | Ze Tang&#39;s Blogs</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://mf1832146.github.io/favicon.ico?v=1701838496309">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://mf1832146.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://mf1832146.github.io">
+        <img class="avatar" src="https://mf1832146.github.io/images/avatar.png?v=1701838496309" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://mf1832146.github.io">
+        <h1 class="site-title">Ze Tang&#39;s Blogs</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="https://mf1832146.github.io/tag/cPlUPLBAs/" class="menu purple-link">
+            代码生成
+          </a>
+        
+      
+        
+          <a href="https://mf1832146.github.io/tag/h1vpXEBBn/" class="menu purple-link">
+            论文阅读
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">基于Codalab做可复现的研究（校外人士必备）</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2023-12-06</span>
+            
+          </div>
+          <div class="post-content" v-pre>
+            <h2 id="前言">前言</h2>
+<p>Codalab是微软开发的工具，目的是为了提高论文的可复现性。</p>
+<p>主要包含两个步骤:</p>
+<ul>
+<li>将数据和代码上传到云端</li>
+<li>将运行指令提交到codalab。指令可以是python语句，脚本，或者系统自带指令。</li>
+</ul>
+<p>codalab会根据指令寻找合适的worker(gpu服务器),将数据和代码一并传送到worker中完成任务。同时提交多个指令给多个worker也很方便，适合赶deadline时并行运行。</p>
+<p>重点：不需要校内vpn(真该死啊，断连，速度慢，搞得无心科研)也可以使用校内服务器，快速上传代码和数据。还能顺便保证论文的可复现性。真可谓校外人士必备神器！</p>
+<h2 id="1-在centos上安装docker以及nvidia-docker">1. 在Centos上安装docker以及nvidia-docker</h2>
+<p>参考资料:</p>
+<ul>
+<li>[1] <a href="https://docs.docker.com/engine/install/centos/">在centos上安装docker</a></li>
+<li>[2] <a href="https://github.com/keineahnung2345/Dockerfiles/blob/master/How%20to%20install%20Nvidia-Docker%202.0%20on%20CentOS%207.md">在centos上安装nvidia-docker</a></li>
+</ul>
+<pre><code class="language-shell"># 1. 安装yum-utils
+yum install -y yum-utils
+# 2. 配置docker镜像
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+# 3. 查看docker-ce版本
+yum list docker-ce --showduplicates | sort -r 
+# 4. docker版本不能超过19, 选择18.03
+yum install docker-ce-18.03.1.ce-1.el7.centos docker-ce-cli-18.03.1.ce-1.el7.centos containerd.io docker-buildx-plugin docker-compose-plugin
+# 5. 测试docker是否正确安装
+sudo systemctl start docker
+sudo docker run hello-world
+# 6. 配置nvidia-docker仓库
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+   &amp;&amp; curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.repo | sudo tee /etc/yum.repos.d/nvidia-container-toolkit.repo
+# 7. 安装nvidia-docker
+sudo yum install -y nvidia-docker2
+
+# 8. docker开机自启动，重启docker
+systemctl enable docker.service
+systemctl restart docker
+
+# 9. 验证gpu是否可用,网址列表在这里: https://catalog.ngc.nvidia.com/orgs/nvidia/containers/cuda,对于11.7版本的cuda,选择
+docker run --runtime=nvidia --rm nvidia/cuda:11.7.1-runtime-centos7 nvidia-smi
+
+</code></pre>
+<h2 id="2-安装codalab-测试通过codalab调用gpu">2. 安装codalab, 测试通过codalab调用gpu</h2>
+<p>参考资料:</p>
+<p>[1] <a href="https://codalab-worksheets.readthedocs.io/en/latest/Execution/">Codalab官网教程</a></p>
+<pre><code class="language-shell"># 1. 安装codalab
+pip install codalab
+# 2. 启动worker,并且输入用户名和密码
+# --verbose 输出日志
+# --tag-exclusive 只接受--request-queue &lt;worker-tag&gt;
+# --tag 指定&lt;worker-tag&gt;
+# --work-dir 指定数据存放地址
+# --cpuset 指定cpu组
+# --gpuset 指定gpu组
+
+# 目前只在210.28.133.13:21678中开启了worker
+cl-worker --tag 21678 --tag-exclusive --work-dir /root/tz/codalab --cpuset &quot;0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20&quot; --gpuset &quot;0,1,2,3&quot; --verbose
+# 3. 测试worker运行
+cl run date
+# 4. 测试在codalab中调用nvidia docker
+cl run --request-docker-image nvidia/cuda:11.7.1-runtime-centos7 --request-gpus 1 &quot;nvidia-smi&quot;
+</code></pre>
+<blockquote>
+<p>PS: 实际使用时，由于nvidia/cuda:11.7.1-runtime-centos7镜像未安装合适的torch包，需要以此为基础，构建自己的dockerfile文件，上传到dockerhub</p>
+</blockquote>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://mf1832146.github.io/post/reading_book_genetic_programming/">
+              <h3 class="post-title">
+                下一篇：《A Field Guide to Genetic Programming》. Riccardo et. al. 2008. Chapter 1 Basics
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan"></div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://mf1832146.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

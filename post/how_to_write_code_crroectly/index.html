@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>如何生成可执行的代码？ | Ze Tang&#39;s Blogs</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://mf1832146.github.io/favicon.ico?v=1701838496309">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://mf1832146.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://mf1832146.github.io">
+        <img class="avatar" src="https://mf1832146.github.io/images/avatar.png?v=1701838496309" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://mf1832146.github.io">
+        <h1 class="site-title">Ze Tang&#39;s Blogs</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="https://mf1832146.github.io/tag/cPlUPLBAs/" class="menu purple-link">
+            代码生成
+          </a>
+        
+      
+        
+          <a href="https://mf1832146.github.io/tag/h1vpXEBBn/" class="menu purple-link">
+            论文阅读
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">如何生成可执行的代码？</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2023-10-02</span>
+            
+              <span>
+                <i class="icon-pricetags-outline"></i>
+                
+                  <a href="https://mf1832146.github.io/tag/h1vpXEBBn/">
+                    reads
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://mf1832146.github.io/tag/cPlUPLBAs/">
+                    codegen
+                    
+                  </a>
+                
+              </span>
+            
+          </div>
+          <div class="post-content" v-pre>
+            <p>目前使用LM生成代码的方式是使用beam search或者sample解码。但是，这两种方式都无法保证生成代码的质量。并且，观察beam search生成的代码片段，发现其中出现大量无用重复的代码。由于分词的原因，代码生成属于长文本生成。beam在生成长文本时会出现大量重复(文本内和文本间)，以及无趣的情况。sample可以使得生成文本具有多样性，但是却也同时引入了随机性。那么该如何生成高可信，或者说可编译的代码是一个问题。</p>
+<!-- more -->
+<h2 id="1-动机">1. 动机</h2>
+<h2 id="2-相关工作">2. 相关工作</h2>
+<p>文章列表</p>
+<table>
+<thead>
+<tr>
+<th>标题</th>
+<th>作者</th>
+<th>单位</th>
+<th>发表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Planning with Large Language Models for Code Generation</td>
+<td>Shun Zhang</td>
+<td>MIT</td>
+<td>ICLR 2023</td>
+</tr>
+<tr>
+<td>Learning Math Reasoning from Self-Sampled Correct and Partially-Correct Solutions</td>
+<td>Ansong Ni</td>
+<td>Microsoft Yale</td>
+<td>ICLR 2023</td>
+</tr>
+<tr>
+<td>LEVER: Learning to Verify Language-to-Code Generation with Execution</td>
+<td>Ansong Ni</td>
+<td>Meta Yale</td>
+<td>arXiv 2023</td>
+</tr>
+<tr>
+<td>ALGO: Synthesizing Algorithmic Programs with Generated Oracle Verifiers</td>
+<td>Kexun Zhang</td>
+<td>UCSB</td>
+<td>arXiv 2023</td>
+</tr>
+<tr>
+<td>Neural Program Generation Modulo Static Analysis</td>
+<td>Rohan</td>
+<td>Rice</td>
+<td>NeurIPS 2021</td>
+</tr>
+</tbody>
+</table>
+<h3 id="21-planning-with-large-language-models-for-code-generation">2.1 Planning with Large Language Models for Code Generation</h3>
+<p>在代码生成中融入强化学习的方法并不少见，比如CodeRL. 但这篇文章不同于之前的文章，将强化学习中的思想(decision making)融入到解码中，提出了一种基于蒙特卡罗树搜索(Monte Carlo tree search, MCTS)的解码方法。</p>
+<figure data-type="image" tabindex="1"><img src="https://mf1832146.github.io/post-images/%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%A0%91%E8%A7%A3%E7%A0%81.png" alt="蒙特卡罗树解码机制" loading="lazy"></figure>
+<ol>
+<li>选择 (Selection): 根据P_UCB算法选择最优节点进行扩展。P_UCB算法是结合探索(Exploit)和应用(Explore)的算法。</li>
+</ol>
+<blockquote>
+<p>如何利用P_UCB选择一个最优节点？从root节点开始，依次选择子树,直到到达一个未被展开的节点为止。选择的策略倾向于选择1) 有较大Q(s,a)的节点 2) 模型认为较可能的动作a 3) s已经被探索过多次，但是动作a被选择的很少的节点. P_UCB公式如下.</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mi mathvariant="normal">_</mi><mi>U</mi><mi>C</mi><mi>B</mi><mo>(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo>)</mo><mo>=</mo><mi>Q</mi><mo>(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo>)</mo><mo>+</mo><mi>β</mi><mo>(</mo><mi>s</mi><mo>)</mo><msub><mi>P</mi><mrow><mi>T</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>s</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>e</mi><mi>r</mi></mrow></msub><mo>(</mo><mi>a</mi><mi mathvariant="normal">∣</mi><mi>s</mi><mo>)</mo><mfrac><msqrt><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mo>(</mo><mi>s</mi><mi mathvariant="normal">.</mi><mi>v</mi><mi>i</mi><mi>s</mi><mi>i</mi><mi>t</mi><mi>s</mi><mo>)</mo></mrow></msqrt><mrow><mn>1</mn><mo>+</mo><msup><mi>s</mi><mo mathvariant="normal">′</mo></msup><mi mathvariant="normal">.</mi><mi>v</mi><mi>i</mi><mi>s</mi><mi>i</mi><mi>t</mi><mi>s</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">P\_UCB(s, a) = Q(s, a) + \beta(s) P_{Transformer}(a|s) \frac{\sqrt{log(s.visits)}}{1+s&#x27;.visits}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathdefault" style="margin-right:0.10903em;">U</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mopen">(</span><span class="mord mathdefault">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">a</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">Q</span><span class="mopen">(</span><span class="mord mathdefault">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">a</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.39933em;vertical-align:-0.7693300000000001em;"></span><span class="mord mathdefault" style="margin-right:0.05278em;">β</span><span class="mopen">(</span><span class="mord mathdefault">s</span><span class="mclose">)</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight">n</span><span class="mord mathdefault mtight">s</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathdefault">a</span><span class="mord">∣</span><span class="mord mathdefault">s</span><span class="mclose">)</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.63em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathdefault">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6778919999999999em;"><span style="top:-2.9890000000000003em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mord">.</span><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="mord mathdefault">i</span><span class="mord mathdefault">s</span><span class="mord mathdefault">i</span><span class="mord mathdefault">t</span><span class="mord mathdefault">s</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.6950000000000003em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.935em;"><span class="svg-align" style="top:-3.2em;"><span class="pstrut" style="height:3.2em;"></span><span class="mord" style="padding-left:1em;"><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathdefault">s</span><span class="mord">.</span><span class="mord mathdefault" style="margin-right:0.03588em;">v</span><span class="mord mathdefault">i</span><span class="mord mathdefault">s</span><span class="mord mathdefault">i</span><span class="mord mathdefault">t</span><span class="mord mathdefault">s</span><span class="mclose">)</span></span></span><span style="top:-2.8950000000000005em;"><span class="pstrut" style="height:3.2em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.28em;"><svg width='400em' height='1.28em' viewBox='0 0 400000 1296' preserveAspectRatio='xMinYMin slice'><path d='M263,681c0.7,0,18,39.7,52,119c34,79.3,68.167,
+158.7,102.5,238c34.3,79.3,51.8,119.3,52.5,120c340,-704.7,510.7,-1060.3,512,-1067
+c4.7,-7.3,11,-11,19,-11H40000v40H1012.3s-271.3,567,-271.3,567c-38.7,80.7,-84,
+175,-136,283c-52,108,-89.167,185.3,-111.5,232c-22.3,46.7,-33.8,70.3,-34.5,71
+c-4.7,4.7,-12.3,7,-23,7s-12,-1,-12,-1s-109,-253,-109,-253c-72.7,-168,-109.3,
+-252,-110,-252c-10.7,8,-22,16.7,-34,26c-22,17.3,-33.3,26,-34,26s-26,-26,-26,-26
+s76,-59,76,-59s76,-60,76,-60z M1001 80H40000v40H1012z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.30499999999999994em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693300000000001em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>公式包含两部分。其中，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>s</mi></mrow><annotation encoding="application/x-tex">s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">s</span></span></span></span>表示当前已经生成的片段代码，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">a</span></span></span></span>表示选择的下一个token. 左边的<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>Q</mi><mo>(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">Q(s,a)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">Q</span><span class="mopen">(</span><span class="mord mathdefault">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">a</span><span class="mclose">)</span></span></span></span>即预期奖励，即未来能够通过编译或者测试用例的比率(文中称，使用该节点扩展的最优程序通过测试率最佳)。但是该奖励对于不完整代码都是0，且下一个词选择范围过多(等于词汇表大小)，因此, 增加了第二部分(探索)。首先规定，每一个状态<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>s</mi></mrow><annotation encoding="application/x-tex">s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">s</span></span></span></span>下最多有<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span>个动作，具体哪<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span>个，由模型决定，即<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>P</mi><mrow><mi>T</mi><mi>r</mi><mi>a</mi><mi>n</mi><mi>s</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>e</mi><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">P_{Transformer}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight">n</span><span class="mord mathdefault mtight">s</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>. 其次，考虑到鼓励探索展开不充分的子树，因此，增加了<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><msqrt><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mo>(</mo><mi>s</mi><mi mathvariant="normal">.</mi><mi>v</mi><mi>i</mi><mi>s</mi><mi>i</mi><mi>t</mi><mi>s</mi><mo>)</mo></mrow></msqrt><mrow><mn>1</mn><mo>+</mo><msup><mi>s</mi><mo mathvariant="normal">′</mo></msup><mi mathvariant="normal">.</mi><mi>v</mi><mi>i</mi><mi>s</mi><mi>i</mi><mi>t</mi><mi>s</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{\sqrt{log(s.visits)}}{1+s&#x27;.visits}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.7329310000000002em;vertical-align:-0.403331em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3296000000000001em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mord mathdefault mtight">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6828285714285715em;"><span style="top:-2.786em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mord mtight">.</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">s</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">t</span><span class="mord mathdefault mtight">s</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.6037625em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0369107142857144em;"><span class="svg-align" style="top:-3.428571428571429em;"><span class="pstrut" style="height:3.428571428571429em;"></span><span class="mord mtight" style="padding-left:1.19em;"><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mopen mtight">(</span><span class="mord mathdefault mtight">s</span><span class="mord mtight">.</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">s</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">t</span><span class="mord mathdefault mtight">s</span><span class="mclose mtight">)</span></span></span><span style="top:-3.0089107142857143em;"><span class="pstrut" style="height:3.428571428571429em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.5428571428571431em;"><svg width='400em' height='1.5428571428571431em' viewBox='0 0 400000 1080' preserveAspectRatio='xMinYMin slice'><path d='M95,702c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,
+-10,-9.5,-14c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54c44.2,-33.3,65.8,
+-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10s173,378,173,378c0.7,0,
+35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429c69,-144,104.5,-217.7,106.5,
+-221c5.3,-9.3,12,-14,20,-14H400000v40H845.2724s-225.272,467,-225.272,467
+s-235,486,-235,486c-2.7,4.7,-9,7,-19,7c-6,0,-10,-1,-12,-3s-194,-422,-194,-422
+s-65,47,-65,47z M834 80H400000v40H845z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4196607142857143em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.403331em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>项. s.visits即s状态被选择的次数。s'是状态s通过a动作扩展后的新状态(将a拼接到s之后)。最后，是倾向于冒险探索，还是保守式地应用，由权重<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>β</mi><mo>(</mo><mi>s</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">\beta(s)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05278em;">β</span><span class="mopen">(</span><span class="mord mathdefault">s</span><span class="mclose">)</span></span></span></span>控制.</p>
+</blockquote>
+<ol>
+<li>扩展 (Expansion): 通过模型选择最合适的<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span>个动作<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">a</span></span></span></span>，将<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>s</mi><mo mathvariant="normal">′</mo></msup><mo>=</mo><mo>(</mo><mi>s</mi><mo separator="true">,</mo><mi>a</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">s&#x27; = (s, a)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.751892em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.751892em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">a</span><span class="mclose">)</span></span></span></span>作为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>s</mi></mrow><annotation encoding="application/x-tex">s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">s</span></span></span></span>的子节点加入到树中.</li>
+<li>评估 (Evaluation): 由于不完整的代码是不能去衡量它的价值(编译率，测试通过率), 因此评估时使用beam search直接解码出完整的代码，对这个节点的价值进行评估</li>
+<li>更新 (Backpropagation): 对该节点及该节点的祖先节点价值进行更新，使用平均价值最为祖先节点的价值</li>
+</ol>
+<blockquote>
+<p>思考:<br>
+虽然文章中提及了可以用缓存的方式避免重复计算。但是测试毕竟是一个比较耗时的方式，同时本文中的方法使用的存储资源应该不低。能否不通过测试的手段来获取到不完整代码的价值？可能的方案有A*算法. 通过思维链? 还是API使用范式？与代码的一致性关系，来计算出方法解决的百分比。<br>
+另一方面，UCB/LinUCB这个策略能否与<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span>NN-LM相结合，用在API推荐中，具体来说把每个API都存储成一个向量，使用UCB来决定是否是依赖LM，还是使用kNN.</p>
+</blockquote>
+<h3 id="22-learning-math-reasoning-from-self-sampled-correct-and-partially-correct-solutions">2.2 Learning Math Reasoning from Self-Sampled Correct and Partially-Correct Solutions</h3>
+<p>和自然语言一样，代码也存在着别名(Alias), 这意味着在生成某个问题的代码解决方案时，可能正确的不止一种。但是，目前在训练模型时，通常只会考虑一种正确解答，也就是&lt;问题、代码&gt;对。这篇工作期望在训练模型时，如果模型生成了正确但是与标准解答不一致的答案时，应当给予认可，而不是将其视为错误(损失)。</p>
+<p>伪代码:<br>
+输入: 模型参数<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">θ</span></span></span></span>, 执行器<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">E</mi></mrow><annotation encoding="application/x-tex">\Epsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord"><span class="mord mathrm">E</span></span></span></span></span>, 一个训练样本<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo>∗</mo><mo separator="true">,</mo><mi>z</mi><mo>∗</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">(x, y*, z*)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord">∗</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span><span class="mord">∗</span><span class="mclose">)</span></span></span></span>, Buffer <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span> for <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span><br>
+其中，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span>是自然语言描述， <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>y</mi><mo>∗</mo></mrow><annotation encoding="application/x-tex">y*</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6597200000000001em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mord">∗</span></span></span></span>是正确的代码标签，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>z</mi><mo>∗</mo></mrow><annotation encoding="application/x-tex">z*</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span><span class="mord">∗</span></span></span></span>是正确的输入输出对。<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span>用来存储全部正确的代码。</p>
+<pre><code>if B is empty:
+    B = B + {y*}
+all_samples = sampleSolution(x, theta, B)  # 从模型中采样代码
+for sample in all_samples:
+    # execute sample with E 
+    if iscorrect(sample) and sample is not duplicate in B:  # 保证B中不会出现重复的代码
+        B = B + {sample}
+
+# 更新模型参数theta， 更新的方式使用多个正确标签下的损失计算
+</code></pre>
+<p>上述伪代码中采样到完全正确的代码其实是比较困难的。因此，本文也利用了部分正确的代码。部分正确的含义是比较生成的代码和正确代码之间的变量快照。如果在前<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">t</span></span></span></span>行的代码快照与正确代码一致，则说明前<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">t</span></span></span></span>行代码的语义是一致的。因此可以将前<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">t</span></span></span></span>行代码与<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">t</span></span></span></span>行之后的正确代码进行拼接，从而生成正确的代码。</p>
+<blockquote>
+<p>思考： 部分正确的代码似乎也是有用的，这篇论文是通过variable tracing的方式来衡量代码是否部分正确。这是否可以帮助A*算法来识别到离正确代码的距离呢？微软正好也做了预测Tracing的模型，是否可以一起使用，来不需要execute就可以避免一些完全不正确的代码出现。<br>
+同时，作者在汇报中也给出了两个chatgpt生成失败的例子，即让chatgpt生成不正确的代码。但是发现，chatgpt生成的代码依然是正确的，只是描述代码时说明是错误的。能否通过control 或者描述和代码一致性方法来避免出现这种情况呢？<br>
+<img src="https://mf1832146.github.io/post-images/1688562157471.png" alt="chatgpt生成出错" loading="lazy"></p>
+</blockquote>
+<h3 id="22-lever-learning-to-verify-language-to-code-generation-with-execution">2.2 LEVER: Learning to Verify Language-to-Code Generation with Execution</h3>
+<h3 id="23-algo-synthesizing-algorithmic-programs-with-generated-oracle-verifiers">2.3 ALGO: Synthesizing Algorithmic Programs with Generated Oracle Verifiers</h3>
+<h3 id="24-neural-program-generation-modulo-static-analysis">2.4 Neural Program Generation Modulo Static Analysis</h3>
+<p>动机: 当生成代码块时，模型会输出基础语义错误的代码，比如未申明变量，或者类型错误。</p>
+<h2 id="3-adversarial-attacks">3. Adversarial Attacks</h2>
+<p>生成正确代码的反面就是去攻击模型，生成错误的代码。<br>
+文章列表</p>
+<table>
+<thead>
+<tr>
+<th>标题</th>
+<th>作者</th>
+<th>单位</th>
+<th>发表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CodeAttack: Code-Based Adversarial Attacks for Pre-trained Programming Language Models</td>
+<td>Akshita Jha</td>
+<td>Virginia Tech</td>
+<td>ariv 2023</td>
+</tr>
+</tbody>
+</table>
+<h3 id="31-codeattack-code-based-adversarial-attacks-for-pre-trained-programming-language-models">3.1 CodeAttack: Code-Based Adversarial Attacks for Pre-trained Programming Language Models</h3>
+<p>这篇文章主要针对代码模型进行攻击，尽可能保持代码的语义一致性，同时让生成的性能下降。</p>
+<ul>
+<li>性能下降的约束:</li>
+</ul>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>Q</mi><mo>(</mo><mi>F</mi><mo>(</mo><mi>X</mi><mo>)</mo><mo>)</mo><mo>−</mo><mi>Q</mi><mo>(</mo><mi>F</mi><mo>(</mo><msub><mi>X</mi><mrow><mi>a</mi><mi>d</mi><mi>v</mi></mrow></msub><mo>)</mo><mo>)</mo><mo>≤</mo><mi>δ</mi></mrow><annotation encoding="application/x-tex">Q(F(X)) - Q(F(X_{adv})) \leq \delta
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">Q</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mclose">)</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">Q</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.07847em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight">d</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03785em;">δ</span></span></span></span></span></p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mo>(</mo><mi>X</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">F(X)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mclose">)</span></span></span></span>表示任务输出，对于代码摘要是自然语言，对于代码翻译是新语言的代码. <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>Q</mi><mo>(</mo><mo>⋅</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">Q(\cdot)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">Q</span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">)</span></span></span></span>表示评估指标，比如对于摘要可以是BLUE.</p>
+<ul>
+<li>代码语义一致性约束:</li>
+</ul>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi><msub><mi>X</mi><mrow><mi>a</mi><mi>d</mi><mi>v</mi></mrow></msub><mo>−</mo><mi>X</mi><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi><mo>&lt;</mo><mi>θ</mi><mtext> and </mtext><mi>S</mi><mi>i</mi><mi>m</mi><mo>(</mo><msub><mi>X</mi><mrow><mi>a</mi><mi>d</mi><mi>v</mi></mrow></msub><mo separator="true">,</mo><mi>X</mi><mo>)</mo><mo>&gt;</mo><mi>ϵ</mi></mrow><annotation encoding="application/x-tex">||X_{adv} - X|| &lt; \theta  \text{ and } Sim(X_{adv}, X) &gt; \epsilon
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord">∣</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.07847em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight">d</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mord">∣</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">θ</span><span class="mord text"><span class="mord"> and </span></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mord mathdefault">i</span><span class="mord mathdefault">m</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.07847em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight">d</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">ϵ</span></span></span></span></span></p>
+<p>生成攻击样本的步骤:</p>
+<ol>
+<li>找到重要的token. 对于每一个token进行Mask, 对比模型输出的Logit outputs. 将逻辑输出与原始的逻辑输出进行对比，选择前<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span>个差异最大的Mask词。这些词就当作重要token.</li>
+<li>使用CodeBert(或者任意的Masked Langauge Model)来对重要Token生成替换。生成的Mask预测需要满足两个限制。
+<ul>
+<li>Mask预测的词和初始词最多只有一个子token不一致</li>
+<li>Mask预测的词和初始词的Type一致。比如Mask的是Identifier, 生成的词也必须是Identifier类型</li>
+</ul>
+</li>
+<li>评估替换的代码是否满足性能下降约束 和 代码语义一致 约束，如果满足，返回替换的代码。</li>
+</ol>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://mf1832146.github.io/post/domain-adaption-in-code-completion/">
+              <h3 class="post-title">
+                下一篇：论文阅读-Domain Adaption in Code Completion.
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan"></div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://mf1832146.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

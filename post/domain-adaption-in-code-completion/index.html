@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>论文阅读-Domain Adaption in Code Completion. | Ze Tang&#39;s Blogs</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://mf1832146.github.io/favicon.ico?v=1701838496309">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://mf1832146.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://mf1832146.github.io">
+        <img class="avatar" src="https://mf1832146.github.io/images/avatar.png?v=1701838496309" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://mf1832146.github.io">
+        <h1 class="site-title">Ze Tang&#39;s Blogs</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="https://mf1832146.github.io/tag/cPlUPLBAs/" class="menu purple-link">
+            代码生成
+          </a>
+        
+      
+        
+          <a href="https://mf1832146.github.io/tag/h1vpXEBBn/" class="menu purple-link">
+            论文阅读
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">论文阅读-Domain Adaption in Code Completion.</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2023-10-02</span>
+            
+              <span>
+                <i class="icon-pricetags-outline"></i>
+                
+                  <a href="https://mf1832146.github.io/tag/h1vpXEBBn/">
+                    reads
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://mf1832146.github.io/tag/cPlUPLBAs/">
+                    codegen
+                    
+                  </a>
+                
+              </span>
+            
+          </div>
+          <div class="post-content" v-pre>
+            <p>Code Completion usually needs domain knowledge, such as project information, domain-related third-party libraries or process knowledge (业务知识). 本博客记录一些关于使用domain知识的代码补全论文。</p>
+<!-- more -->
+<h3 id="1-文章列表">1. 文章列表</h3>
+<table>
+<thead>
+<tr>
+<th>标题</th>
+<th>作者</th>
+<th>出版</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RepoBench: Benchmarking Repository-Level Code Auto-Completion Systems</td>
+<td>Tianyang Liu</td>
+<td>arxiv, 2023</td>
+</tr>
+<tr>
+<td>Automated Test Case Generation Using Code Models and Domain Adaptation</td>
+<td>Sepehr Hashtroudi</td>
+<td></td>
+</tr>
+<tr>
+<td>Better Context Makes Better Code Language Models: A Case Study on Function Call Argument Completion</td>
+<td>Hengzhi Pei</td>
+<td>AAAI 2023</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-介绍">2. 介绍</h3>
+<h4 id="21-repobench">2.1 RepoBench</h4>
+<p>针对Repo级别的代码补全提出了三个benchmark，涉及的语言包含Java和Python.数据集构建如下:</p>
+<ul>
+<li>Repo-R: 将import语句</li>
+<li>Repo-C:</li>
+<li>Repo-P:</li>
+</ul>
+<p>存在的不足:</p>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://mf1832146.github.io/post/reads_tree_probing/">
+              <h3 class="post-title">
+                下一篇：论文阅读 - A Structural Probe for Finding Syntax in Word Representations
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan"></div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://mf1832146.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>
