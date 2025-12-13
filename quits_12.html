@@ -487,15 +487,15 @@
       showWrongOnly: false       // 是否只显示错题
     };
 
-    window.onbeforeunload = () => {
-      localStorage.setItem("answerStatus", JSON.stringify(answerStatus));
-      localStorage.setItem("favoriteStatus", JSON.stringify(favoriteStatus));
-    };
-
-    window.onload = () => {
-      answerStatus = JSON.parse(localStorage.getItem("answerStatus") || "{}");
-      favoriteStatus = JSON.parse(localStorage.getItem("favoriteStatus") || "{}");
-    };
+    // window.onbeforeunload = () => {
+    //   localStorage.setItem("answerStatus", JSON.stringify(answerStatus));
+    //   localStorage.setItem("favoriteStatus", JSON.stringify(favoriteStatus));
+    // };
+    //
+    // window.onload = () => {
+    //   answerStatus = JSON.parse(localStorage.getItem("answerStatus") || "{}");
+    //   favoriteStatus = JSON.parse(localStorage.getItem("favoriteStatus") || "{}");
+    // };
 
 
     // 页面加载完成后初始化
