@@ -1306,7 +1306,14 @@
      * 滚动到页面顶部
      */
     function scrollToTop() {
-      document.querySelector('.main-content').scrollTop = 0;
+      const questionList = document.getElementById("question-list");
+      if (questionList) {
+        const top = questionList.getBoundingClientRect().top + window.pageYOffset - 20;
+        window.scrollTo({
+          top: top,
+          behavior: "smooth"
+        });
+      }
     }
   </script>
 </body>
