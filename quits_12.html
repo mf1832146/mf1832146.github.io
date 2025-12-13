@@ -850,7 +850,7 @@ function loadLocalState(){
         // 如果只显示错题，过滤出当前题型的错题
         let displayQuestions = questions;
         if (pageState.showWrongOnly && !pageState.searchMode) {
-          displayQuestions = questions.filter(q => answerStatus[q.uniqueKey] === "incorrect");
+          displayQuestions = questions.filter(q => answerStatus[q.uniqueKey] === "incorrect" || favoriteStatus[q.uniqueKey]);
         }
 
         displayQuestions.forEach((question, index) => {
