@@ -726,26 +726,67 @@ function loadLocalState(){
 
       Object.keys(TYPE_MAPPING).forEach(typeName => {
         const typeKey = TYPE_MAPPING[typeName];
-        // 打乱当前题型组的题目顺序（Fisher-Yates 洗牌算法）
+
+        // 1. 复制题目数组
         const shuffled = [...questionData[currentBank][typeKey]];
+
+        // 2. 打乱题目顺序（Fisher–Yates）
         for (let i = shuffled.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
+
+        // 3. 打乱选项顺序
+        shuffled.forEach(question => {
+          if (question.selections) {
+            const entries = Object.entries(question.selections); // [['A','xxx'], ['B','xxx'], ...]
+
+            // 洗牌选项
+            for (let i = entries.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [entries[i], entries[j]] = [entries[j], entries[i]];
+            }
+
+            // 重新生成 A/B/C/D 的键
+            const newSelections = {};
+            const optionLabels = ['A', 'B', 'C', 'D', 'E'];
+
+            entries.forEach((entry, idx) => {
+              newSelections[optionLabels[idx]] = entry[1];
+            });
+
+            // 修改答案的键
+            if (question.answer) {
+              const oldAnsArray = question.answer.split("");
+              const newAnsArray = [];
+
+              entries.forEach((entry, idx) => {
+                const oldKey = entry[0];
+                if (oldAnsArray.includes(oldKey)) {
+                  newAnsArray.push(optionLabels[idx]);
+                }
+              });
+
+              question.answer = newAnsArray.join("");
+            }
+
+            question.selections = newSelections;
+          }
+        });
+
+        // 保存结果
         questionData[currentBank][typeKey] = shuffled;
-        // 更新总页数
+
+        // 更新分页
         pageState.totalPages[currentBank][typeKey] = Math.ceil(shuffled.length / pageState.pageSize);
       });
 
-      // 重置当前页为第一页
+      // 重置到第一页并刷新 UI
       pageState.currentPage = 1;
-
-      // 重新渲染
       renderAllNavItems();
       renderQuestions();
       renderPagination();
     }
-
     /**
      * 执行搜索功能
      */
