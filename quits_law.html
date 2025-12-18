@@ -423,6 +423,7 @@
         <button class="decrypt-btn" id="decrypt-btn">输入密码</button>
       </div>
       <select class="question-bank-selector" id="question-bank-selector">
+            <option value="bank0">0.武器使用理论题</option>
             <option value="bank1">1.社会主义法治理念</option>
             <option value="bank2">2.法律基本概念</option>
             <option value="bank3">3.宪法</option>
@@ -448,7 +449,7 @@
 
     <!-- 打乱顺序按钮 -->
     <button class="shuffle-btn" id="shuffle-btn">打乱题目和选项的顺序</button>
-      <button class="show-wrong-btn" id="show-wrong-btn">只显示错题</button>
+      <button class="show-wrong-btn" id="show-wrong-btn">显示收藏和错题</button>
     <div class="loading" id="loading">题库已加密，请输入密码，解压题库...</div>
     <div class="error" id="error" style="display: none;"></div>
     <div id="question-list"></div>
@@ -483,6 +484,10 @@
   <script>
     // 题库配置 - 每个题库对应一个JSON文件
     const BANK_CONFIG = {
+        bank0: {
+            name: "武器使用理论题",
+            path: "https://zetang94.github.io/assets/quits/law/0.武器使用理论题.txt"
+        },
         bank1: {
             name: "社会主义法治理念",
             path: "https://zetang94.github.io/assets/quits/law/1.社会主义法治理念.txt"
@@ -542,6 +547,9 @@
     let originalQuestionData = {};
     // 作答状态：key=题库-题型-题目ID，避免同ID冲突
     let answerStatus = {};
+    let favoriteStatus = {};
+    const PASSWORD_CACHE_KEY = "quiz_pwd_cache";
+    const BANK_CACHE_KEY = "quiz_last_bank";
     // 翻页相关变量
     let pageState = {
       currentBank: "bank1",      // 当前激活的题库
@@ -556,9 +564,22 @@
         decrypted: false           // 是否已解密
     };
 
+    // window.onbeforeunload = () => {
+    //   localStorage.setItem("answerStatus", JSON.stringify(answerStatus));
+    //   localStorage.setItem("favoriteStatus", JSON.stringify(favoriteStatus));
+    //   localStorage.setItem("password", "");
+    // };
+
     // 页面加载完成后初始化
     window.onload = async function() {
       try {
+      answerStatus = JSON.parse(localStorage.getItem("answerStatus") || "{}");
+      favoriteStatus = JSON.parse(localStorage.getItem("favoriteStatus") || "{}");
+      const cachedBank = localStorage.getItem(BANK_CACHE_KEY);
+        if (cachedBank && BANK_CONFIG[cachedBank]) {
+          pageState.currentBank = cachedBank;
+        }
+         document.getElementById("question-bank-selector").value = pageState.currentBank;
         // 初始化所有题库容器
         Object.keys(BANK_CONFIG).forEach(bankKey => {
           questionData[bankKey] = {
@@ -584,6 +605,13 @@
         // renderQuestions();
         // renderPagination();
         bindEvents();
+
+        const cachedPwd = localStorage.getItem(PASSWORD_CACHE_KEY);
+        if (cachedPwd) {
+          document.getElementById("password-input").value = cachedPwd;
+          document.getElementById("decrypt-btn").click();
+        }
+
 
         // 显示内容，隐藏加载提示
         //document.getElementById("loading").style.display = "none";
@@ -637,6 +665,16 @@
         }
       });
 
+      // 收藏按钮点击
+    document.getElementById("question-list").addEventListener("click", (e) => {
+      if (e.target.classList.contains("favorite-btn")) {
+        const key = e.target.dataset.key;
+        favoriteStatus[key] = !favoriteStatus[key];
+        e.target.textContent = favoriteStatus[key] ? "⭐" : "☆";
+        saveLocalState();
+      }
+    });
+
       // 下一页按钮
       document.getElementById("next-page").addEventListener("click", () => {
         let totalPages;
@@ -645,7 +683,8 @@
         } else {
           let currentQuestions = questionData[pageState.currentBank][pageState.currentType];
           if (pageState.showWrongOnly) {
-            currentQuestions = currentQuestions.filter(q => answerStatus[q.uniqueKey] === "incorrect");
+            currentQuestions = currentQuestions.filter(q => answerStatus[q.uniqueKey] === "incorrect"||
+    favoriteStatus[q.uniqueKey]);
           }
           totalPages = Math.ceil(currentQuestions.length / pageState.pageSize) || 1;
         }
@@ -689,7 +728,11 @@
 
       // 题库切换事件
       document.getElementById("question-bank-selector").addEventListener("change", (e) => {
-        switchQuestionBank(e.target.value);
+          const bank = e.target.value;
+
+            // ✅ 保存当前 bank
+            localStorage.setItem(BANK_CACHE_KEY, bank);
+          switchQuestionBank(e.target.value);
       });
 
       // 错题筛选按钮事件
@@ -768,6 +811,8 @@
         if (!Array.isArray(questions)) {
           throw new Error("解密结果不是有效的题目数组");
         }
+
+        localStorage.setItem(PASSWORD_CACHE_KEY, password);
 
         // 按题型分类存储题目
         const judgment = [];
@@ -1085,7 +1130,8 @@
         // 如果只显示错题，过滤出当前题型的错题
         let displayQuestions = questions;
         if (pageState.showWrongOnly && !pageState.searchMode) {
-          displayQuestions = questions.filter(q => answerStatus[q.uniqueKey] === "incorrect");
+          displayQuestions = questions.filter(q => answerStatus[q.uniqueKey] === "incorrect" ||
+  favoriteStatus[q.uniqueKey]);
         }
 
         displayQuestions.forEach((question, index) => {
@@ -1173,13 +1219,14 @@
 
         // 如果只显示错题，进行过滤
         if (pageState.showWrongOnly) {
-          currentQuestions = currentQuestions.filter(q => answerStatus[q.uniqueKey] === "incorrect");
+          currentQuestions = currentQuestions.filter(q => answerStatus[q.uniqueKey] === "incorrect" ||
+  favoriteStatus[q.uniqueKey]);
         }
 
         // 无题目时的提示
         if (currentQuestions.length === 0) {
           const message = pageState.showWrongOnly
-            ? "当前题型没有错题"
+            ? "当前题型没有收藏或错题"
             : `暂无${Object.keys(TYPE_MAPPING).find(name => TYPE_MAPPING[name] === pageState.currentType)}题目`;
           questionList.innerHTML = `<div class="error">${message}</div>`;
           return;
@@ -1216,7 +1263,15 @@
 
         // 构建题目HTML
         questionEl.innerHTML = `
-          <div class="question-header">${questionId}. ${highlightedQuestionContent}</div>
+          <div class="question-header">${questionId}. ${highlightedQuestionContent}
+              <span
+                class="favorite-btn"
+                data-key="${uniqueKey}"
+                style="float:right;cursor:pointer;font-size:1.2rem;"
+              >
+                ${favoriteStatus[uniqueKey] ? '⭐' : '☆'}
+              </span>
+          </div>
           ${optionsHtml}
           <button class="btn-check" data-unique-key="${uniqueKey}">查看解析</button>
           <div class="result" id="result-${uniqueKey}"></div>
@@ -1361,6 +1416,11 @@
       }
     }
 
+    function saveLocalState(){
+      localStorage.setItem("answerStatus", JSON.stringify(answerStatus));
+      localStorage.setItem("favoriteStatus", JSON.stringify(favoriteStatus));
+    }
+
     /**
      * 渲染翻页控件
      */
@@ -1374,7 +1434,8 @@
         // 计算当前条件下的总页数
         let currentQuestions = questionData[pageState.currentBank][pageState.currentType];
         if (pageState.showWrongOnly) {
-          currentQuestions = currentQuestions.filter(q => answerStatus[q.uniqueKey] === "incorrect");
+          currentQuestions = currentQuestions.filter(q => answerStatus[q.uniqueKey] === "incorrect" ||
+  favoriteStatus[q.uniqueKey]);
         }
         totalPages = Math.ceil(currentQuestions.length / pageState.pageSize) || 1;
       }
