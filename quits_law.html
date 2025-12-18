@@ -555,7 +555,7 @@
       currentBank: "bank1",      // 当前激活的题库
       currentType: "judgment",   // 当前激活的题型
       currentPage: 1,            // 当前页码
-      pageSize: 20,               // 每页显示题目数
+      pageSize: 5,               // 每页显示题目数
       totalPages: {},            // 各题型总页数（key=题型key）
       searchMode: false,         // 是否处于搜索模式
       searchResults: [],         // 搜索结果
@@ -1417,7 +1417,7 @@
     }
 
     function saveLocalState(){
-      localStorage.setItem("answerStatus", JSON.stringify(answerStatus));
+      //localStorage.setItem("answerStatus", JSON.stringify(answerStatus));
       localStorage.setItem("favoriteStatus", JSON.stringify(favoriteStatus));
     }
 
